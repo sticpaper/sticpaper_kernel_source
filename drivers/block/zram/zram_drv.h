@@ -67,6 +67,17 @@ enum zram_pageflags {
 
 #define ZRAM_WB_IDLE_DEFAULT ZRAM_WB_IDLE_MIN
 
+#ifdef CONFIG_ZRAM_WRITEBACK
+#define MAX_WRITEBACK_ORDER		5
+#define MAX_WRITEBACK_SIZE		(1 << MAX_WRITEBACK_ORDER)
+
+struct writeback_batch_pages
+{
+	struct page *page;
+	int index;
+};
+#endif
+
 /*-- Data structures */
 
 struct zram_entry {
@@ -171,6 +182,8 @@ struct zram {
 	unsigned int old_block_size;
 	unsigned long *bitmap;
 	unsigned long nr_pages;
+	/* for batch writeback */
+	struct page *writeback_pages;
 #endif
 #ifdef CONFIG_ZRAM_MEMORY_TRACKING
 	struct dentry *debugfs_dir;

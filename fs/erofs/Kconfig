@@ -93,3 +93,10 @@ config EROFS_FS_PCPU_KTHREAD_HIPRI
 	  at higher priority.
 
 	  If unsure, say N.
+
+config EROFS_FS_PAPER_THREAD_OPT
+	bool "EROFS high priority per-CPU kthread workers"
+	depends on EROFS_FS_PCPU_KTHREAD
+	help
+	  This permits EROFS to configure per-CPU kthread workers to run
+	  at higher priority.

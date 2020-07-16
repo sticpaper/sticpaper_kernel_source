@@ -21,7 +21,11 @@
 #include "trace.h"
 #include <trace/events/f2fs.h>
 
+#ifdef CONFIG_F2FS_CHECKPOINT_IOPRIO_OPT
+#define DEFAULT_CHECKPOINT_IOPRIO (IOPRIO_PRIO_VALUE(IOPRIO_CLASS_RT, 4))
+#else /* CONFIG_F2FS_CHECKPOINT_IOPRIO_OPT */
 #define DEFAULT_CHECKPOINT_IOPRIO (IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, 3))
+#endif /* CONFIG_F2FS_CHECKPOINT_IOPRIO_OPT */
 
 static struct kmem_cache *ino_entry_slab;
 struct kmem_cache *f2fs_inode_entry_slab;

@@ -358,6 +358,12 @@ Contact:	"Daeho Jeong" <daehojeong@google.com>
 Description:	Give a way to change iostat_period time. 3secs by default.
 		The new iostat trace gives stats gap given the period.
 
+What:		/sys/fs/f2fs/<disk>/atgc_enabled
+Date:		Feb 2024
+Contact:	"Jinbao Liu" <liujinbao1@xiaomi.com>
+Description:	It represents whether ATGC is on or off. The value is 1 which
+               indicates that ATGC is on, and 0 indicates that it is off.
+
 What:		/sys/fs/f2fs/<disk>/atgc_candidate_ratio
 Date:		May 2021
 Contact:	"Chao Yu" <yuchao0@huawei.com>

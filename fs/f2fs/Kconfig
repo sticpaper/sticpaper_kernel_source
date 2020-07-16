@@ -114,6 +114,12 @@ config F2FS_DEF_OPTIONS_OPT
 
 	  If unsure, say N.
 
+config F2FS_CHECKPOINT_IOPRIO_OPT
+	bool "F2FS checkpoint ioprio opt"
+	depends on F2FS_FS
+	help
+	  change f2fs-ckpt ioprio priority mode.
+
 config F2FS_FS_COMPRESSION
 	bool "F2FS compression feature"
 	depends on F2FS_FS

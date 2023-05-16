@@ -98,7 +98,8 @@ scm_version()
 			# If we don't have a tag at all we print -g{commitish},
 			# again using exactly 12 hex chars.
 			else
-				head="$(echo $head | cut -c1-12)"
+				# PAPER-BuildBot: change Git-Hash len to 9.
+				head="$(echo $head | cut -c1-9)"
 				printf '%s%s' -g $head
 			fi
 		fi
@@ -204,15 +205,6 @@ res="${res}${CONFIG_LOCALVERSION}${LOCALVERSION}"
 if test "$CONFIG_LOCALVERSION_AUTO" = "y"; then
 	# full scm version string
 	res="$res$(scm_version)"
-else
-	# append a plus sign if the repository is not in a clean
-	# annotated or signed tagged state (as git describe only
-	# looks at signed or annotated tags - git tag -a/-s) and
-	# LOCALVERSION= is not specified
-	if test "${LOCALVERSION+set}" != "set"; then
-		scm=$(scm_version --short)
-		res="$res${scm:++}"
-	fi
 fi
 
 echo "$res"

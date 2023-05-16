@@ -261,6 +261,10 @@ struct mem_cgroup {
 	 * mem_cgroup ? And what type of charges should we move ?
 	 */
 	unsigned long move_charge_at_immigrate;
+#ifdef CONFIG_ZRAM_WRITEBACK
+	unsigned long anno_writeback_enable;
+	unsigned long anno_writeback_protected;
+#endif
 	/* taken only while moving_account > 0 */
 	spinlock_t		move_lock;
 	unsigned long		move_lock_flags;

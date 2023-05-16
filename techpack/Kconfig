@@ -1,0 +1,14 @@
+menu "Tech packages"
+
+config TECHPACK_XIAOMI_CAMERA
+    bool "Xiaomi techpack camera default"
+
+config TECHPACK_XIAOMI_CAMERA_CAS
+    bool "Xiaomi techpack camera cas config"
+
+config TECHPACK_XIAOMI_CAS_PATCH
+    bool "Xiaomi techpack cas camera patch"
+
+source "techpack/data/Kconfig"
+
+endmenu

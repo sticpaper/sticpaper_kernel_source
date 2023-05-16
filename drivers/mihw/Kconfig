@@ -1,0 +1,8 @@
+config MIHW
+	bool "Xiaomi Kernel Feature config"
+	depends on ARCH_QCOM
+	default y
+
+config MILLET
+	bool "frozen framework"
+	depends on MIHW

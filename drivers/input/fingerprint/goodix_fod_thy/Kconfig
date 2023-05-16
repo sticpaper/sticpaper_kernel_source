@@ -1,0 +1,3 @@
+config FINGERPRINT_GOODIX_FOD_THY
+	tristate "Finger print card goodix"
+	depends on INPUT_FINGERPRINT

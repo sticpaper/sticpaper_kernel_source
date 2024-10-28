@@ -1191,9 +1191,9 @@ SYSCALL_DEFINE1(newuname, struct new_utsname __user *, name)
 	if (!strncmp(current->comm, "bpfloader", 9) ||
 	    !strncmp(current->comm, "netbpfload", 10) ||
 	    !strncmp(current->comm, "netd", 4)) {
-		strcpy(tmp.release, "4.19.0");
-		pr_debug("fake uname: %s/%d release=%s\n",
-			 current->comm, current->pid, tmp.release);
+		strcpy(tmp.release, "4.19.280");
+		pr_debug("uname: %s release=%s\n",
+			 current->comm, tmp.release);
 	}
 	up_read(&uts_sem);
 	if (copy_to_user(name, &tmp, sizeof(tmp)))

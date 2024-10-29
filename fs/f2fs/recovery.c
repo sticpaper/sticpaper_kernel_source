@@ -5,6 +5,7 @@
  * Copyright (c) 2012 Samsung Electronics Co., Ltd.
  *             http://www.samsung.com/
  */
+#include <asm/unaligned.h>
 #include <linux/fs.h>
 #include <linux/f2fs_fs.h>
 #include "f2fs.h"
@@ -107,13 +108,60 @@ static void del_fsync_inode(struct fsync_inode_entry *entry, int drop)
 	kmem_cache_free(fsync_entry_slab, entry);
 }
 
+static int init_recovered_filename(const struct inode *dir,
+				   struct f2fs_inode *raw_inode,
+				   struct f2fs_filename *fname,
+				   struct qstr *usr_fname)
+{
+	int err;
+
+	memset(fname, 0, sizeof(*fname));
+	fname->disk_name.len = le32_to_cpu(raw_inode->i_namelen);
+	fname->disk_name.name = raw_inode->i_name;
+
+	if (WARN_ON(fname->disk_name.len > F2FS_NAME_LEN))
+		return -ENAMETOOLONG;
+
+	if (!IS_ENCRYPTED(dir)) {
+		usr_fname->name = fname->disk_name.name;
+		usr_fname->len = fname->disk_name.len;
+		fname->usr_fname = usr_fname;
+	}
+
+	/* Compute the hash of the filename */
+	if (IS_ENCRYPTED(dir) && IS_CASEFOLDED(dir)) {
+		/*
+		 * In this case the hash isn't computable without the key, so it
+		 * was saved on-disk.
+		 */
+		if (fname->disk_name.len + sizeof(f2fs_hash_t) > F2FS_NAME_LEN)
+			return -EINVAL;
+		fname->hash = get_unaligned((f2fs_hash_t *)
+				&raw_inode->i_name[fname->disk_name.len]);
+	} else if (IS_CASEFOLDED(dir)) {
+		err = f2fs_init_casefolded_name(dir, fname);
+		if (err)
+			return err;
+		f2fs_hash_filename(dir, fname);
+#ifdef CONFIG_UNICODE
+		/* Case-sensitive match is fine for recovery */
+		kfree(fname->cf_name.name);
+		fname->cf_name.name = NULL;
+#endif
+	} else {
+		f2fs_hash_filename(dir, fname);
+	}
+	return 0;
+}
+
 static int recover_dentry(struct inode *inode, struct page *ipage,
 						struct list_head *dir_list)
 {
 	struct f2fs_inode *raw_inode = F2FS_INODE(ipage);
 	nid_t pino = le32_to_cpu(raw_inode->i_pino);
 	struct f2fs_dir_entry *de;
-	struct fscrypt_name fname;
+	struct f2fs_filename fname;
+	struct qstr usr_fname;
 	struct page *page;
 	struct inode *dir, *einode;
 	struct fsync_inode_entry *entry;
@@ -132,16 +180,9 @@ static int recover_dentry(struct inode *inode, struct page *ipage,
 	}
 
 	dir = entry->inode;
-
-	memset(&fname, 0, sizeof(struct fscrypt_name));
-	fname.disk_name.len = le32_to_cpu(raw_inode->i_namelen);
-	fname.disk_name.name = raw_inode->i_name;
-
-	if (unlikely(fname.disk_name.len > F2FS_NAME_LEN)) {
-		WARN_ON(1);
-		err = -ENAMETOOLONG;
+	err = init_recovered_filename(dir, raw_inode, &fname, &usr_fname);
+	if (err)
 		goto out;
-	}
 retry:
 	de = __f2fs_find_entry(dir, &fname, &page);
 	if (de && inode->i_ino == le32_to_cpu(de->ino))
@@ -542,7 +583,7 @@ retry_dn:
 
 	f2fs_wait_on_page_writeback(dn.node_page, NODE, true, true);
 
-	err = f2fs_get_node_info(sbi, dn.nid, &ni);
+	err = f2fs_get_node_info(sbi, dn.nid, &ni, false);
 	if (err)
 		goto err;
 
@@ -711,7 +752,7 @@ next:
 		f2fs_put_page(page, 1);
 	}
 	if (!err)
-		f2fs_allocate_new_segments(sbi, NO_CHECK_TYPE);
+		f2fs_allocate_new_segments(sbi);
 	return err;
 }
 
@@ -751,7 +792,7 @@ int f2fs_recover_fsync_data(struct f2fs_sb_info *sbi, bool check_only)
 	INIT_LIST_HEAD(&dir_list);
 
 	/* prevent checkpoint */
-	mutex_lock(&sbi->cp_mutex);
+	f2fs_down_write(&sbi->cp_global_sem);
 
 	/* step #1: find fsynced inode numbers */
 	err = find_fsync_dnodes(sbi, &inode_list, check_only);
@@ -787,7 +828,8 @@ skip:
 	} else {
 		clear_sbi_flag(sbi, SBI_POR_DOING);
 	}
-	mutex_unlock(&sbi->cp_mutex);
+
+	f2fs_up_write(&sbi->cp_global_sem);
 
 	/* let's drop all the directory inodes for clean checkpoint */
 	destroy_fsync_dnodes(&dir_list, err);

@@ -223,6 +223,9 @@ struct nvt_ts_data {
 #ifndef NVT_SAVE_TESTDATA_IN_FILE
 	void *testdata;
 #endif
+#ifdef CONFIG_TOUCHSCREEN_COMMON
+	bool pen_update;
+#endif
 };
 
 #if NVT_TOUCH_PROC

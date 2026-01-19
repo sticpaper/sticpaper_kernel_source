@@ -1,8 +1,18 @@
 # SPDX-License-Identifier: GPL-2.0-only
 TECHPACK?=y
 
-techpack-dirs := $(shell find $(srctree)/techpack -maxdepth 1 -mindepth 1 -type d -not -name ".*")
-obj-${TECHPACK} += stub/ $(addsuffix /,$(subst $(srctree)/techpack/,,$(techpack-dirs)))
-
-techpack-header-dirs := $(shell find $(srctree)/techpack -maxdepth 1 -mindepth 1 -type d -not -name ".*")
-header-${TECHPACK} += $(addsuffix /include/uapi/,$(subst $(srctree)/techpack/,,$(techpack-header-dirs)))
+obj-y += stub/ audio/ data/ display/ video/
+header-y += stub/include/uapi/ audio/include/uapi/
+ifeq ($(CONFIG_TECHPACK_XIAOMI_CAMERA),y)
+obj-y += camera-xiaomi/
+header-y += camera-xiaomi/include/uapi/
+else ifeq ($(CONFIG_TECHPACK_XIAOMI_CAMERA_PSYCHE),y)
+obj-y += camera-xiaomi-psyche/
+header-y += camera-xiaomi-psyche/include/uapi/
+else ifeq ($(CONFIG_TECHPACK_XIAOMI_CAMERA_CAS),y)
+obj-y += camera-xiaomi-cas/
+header-y += camera-xiaomi-cas/include/uapi/
+else
+obj-y += camera/
+header-y += camera/include/uapi/
+endif

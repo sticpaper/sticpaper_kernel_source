@@ -1,0 +1,3 @@
+config FINGERPRINT_FPC_FOD
+	tristate "FPC1020 fingerprint sensor IRQ support"
+	depends on INPUT_FINGERPRINT

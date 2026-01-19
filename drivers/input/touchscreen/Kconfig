@@ -11,6 +11,15 @@ menuconfig INPUT_TOUCHSCREEN
 
 if INPUT_TOUCHSCREEN
 
+source "drivers/input/touchscreen/xiaomi/Kconfig"
+source "drivers/input/touchscreen/gt9886/Kconfig"
+source "drivers/input/touchscreen/focaltech_spi/Kconfig"
+source "drivers/input/touchscreen/focaltech_touch/Kconfig"
+source "drivers/input/touchscreen/fts_521/Kconfig"
+source "drivers/input/touchscreen/fts_spi/Kconfig"
+source "drivers/input/touchscreen/nt36672c/Kconfig"
+source "drivers/input/touchscreen/nt36532/Kconfig"
+
 config TOUCHSCREEN_PROPERTIES
 	def_tristate INPUT
 	depends on INPUT
@@ -1321,12 +1330,19 @@ config TOUCHSCREEN_ST
 	  To compile this driver as a module, choose M here: the
 	  module will be called st.
 
-source "drivers/input/touchscreen/st/Kconfig"
+config SECURE_TOUCH
+	bool "Secure Touch support for Xiaomi Touchscreen"
+	help
+          Say Y here
+	  -Goodix touch driver is connected
+	  -To enable secure touch for Goodix touch driver
+
+	  If unsure, say N.
 
 config TOUCHSCREEN_SYNAPTICS_DSX
 	bool "Synaptics DSX Touchscreen Driver"
 	depends on I2C
-	default y
+	default n 
 	help
 	  Say Y here if you have a Synaptics Touchscreen.
 
@@ -1334,8 +1350,6 @@ config TOUCHSCREEN_SYNAPTICS_DSX
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called synaptics_dsx.
-
-source "drivers/input/touchscreen/synaptics_dsx/Kconfig"
 
 config TOUCHSCREEN_SYNAPTICS_TCM
 	bool "Synaptics TCM Touchscreen Driver"
@@ -1349,10 +1363,31 @@ config TOUCHSCREEN_SYNAPTICS_TCM
 	  To compile this driver as a module, choose M here: the
 	  module will be called synaptics_tcm.
 
-source "drivers/input/touchscreen/synaptics_tcm/Kconfig"
+config INPUT_PRESS_NDT
+	bool "ndt"
+	depends on I2C
+	help
+	  Say Y here if you have a press ic ndt.
 
-source "drivers/input/touchscreen/focaltech_touch/Kconfig"
+config TOUCHSCREEN_HIMAX_CHIPSET
+	bool "Himax touchpanel CHIPSET"
+	depends on I2C
+	help
+		Say Y here if you have a Himax CHIPSET touchscreen.
+		HIMAX controllers are multi touch controllers which can
+		report 10 touches at a time.
 
-source "drivers/input/touchscreen/nt36xxx/Kconfig"
+		If unsure, say N.
+
+source "drivers/input/touchscreen/hxchipset/Kconfig"
+
+config TOUCHSCREEN_COMMON
+	bool "Common touchscreen interface to interact with userspace"
+	default y
+	help
+	  Say Y here if you want to control touchpanel features via
+	  /sys/touchpanel.
+
+	  If unsure, say N.
 
 endif

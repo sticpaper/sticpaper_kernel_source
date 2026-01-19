@@ -632,6 +632,7 @@ struct ravg {
 	u32 coloc_demand;
 	u32 sum_history[RAVG_HIST_SIZE_MAX];
 	u32 *curr_window_cpu, *prev_window_cpu;
+	u64 proc_load;
 	u32 curr_window, prev_window;
 	u32 pred_demand;
 	u8 busy_buckets[NUM_BUSY_BUCKETS];
@@ -926,6 +927,14 @@ struct task_struct {
 	int				rcu_tasks_idle_cpu;
 	struct list_head		rcu_tasks_holdout_list;
 #endif /* #ifdef CONFIG_TASKS_RCU */
+
+#ifdef CONFIG_TASKS_TRACE_RCU
+	int				trc_reader_nesting;
+	int				trc_ipi_to_cpu;
+	bool				trc_reader_need_end;
+	bool				trc_reader_checked;
+	struct list_head		trc_holdout_list;
+#endif /* #ifdef CONFIG_TASKS_TRACE_RCU */
 
 	struct sched_info		sched_info;
 
@@ -1378,6 +1387,19 @@ struct task_struct {
 	 */
 	u64				timer_slack_ns;
 	u64				default_timer_slack_ns;
+	unsigned int			top_app;
+	unsigned int			inherit_top_app;
+	unsigned int    		critical_task;
+#ifdef CONFIG_PERF_CRITICAL_RT_TASK
+	unsigned int    		critical_rt_task;
+#endif
+#ifdef CONFIG_SF_BINDER
+	unsigned int			sf_binder_task;
+#endif
+#ifdef CONFIG_PERF_HUMANTASK
+	unsigned int                    human_task;
+	unsigned int			cpux;
+#endif
 
 #ifdef CONFIG_KASAN
 	unsigned int			kasan_depth;
@@ -1478,6 +1500,16 @@ struct task_struct {
 	/* Used by LSM modules for access restriction: */
 	void				*security;
 #endif
+
+#ifdef CONFIG_KPERFEVENTS
+	/* lock to protect kperfevents */
+	rwlock_t kperfevents_lock;
+	/* perfevents of current task, only effective for group leader.
+	 * accessible for all tasks in one group.
+	 */
+	void *kperfevents;
+#endif
+
 	/* task is frozen/stopped (used by the cgroup freezer) */
 	ANDROID_KABI_USE(1, unsigned frozen:1);
 
@@ -1679,6 +1711,7 @@ extern struct pid *cad_pid;
 #define PF_RANDOMIZE		0x00400000	/* Randomize virtual address space */
 #define PF_SWAPWRITE		0x00800000	/* Allowed to write to swap */
 #define PF_MEMSTALL		0x01000000	/* Stalled due to lack of memory */
+#define PF_UMH			0x02000000	/* I'm an Usermodehelper process */
 #define PF_NO_SETAFFINITY	0x04000000	/* Userland is not allowed to meddle with cpus_allowed */
 #define PF_MCE_EARLY		0x08000000      /* Early kill for mce process policy */
 #define PF_WAKE_UP_IDLE         0x10000000	/* TTWU on an idle CPU */
@@ -2223,4 +2256,14 @@ static inline void set_wake_up_idle(bool enabled)
 		current->flags &= ~PF_WAKE_UP_IDLE;
 }
 
+extern inline bool is_critical_task(struct task_struct *p);
+
+extern inline bool is_top_app(struct task_struct *p);
+
+extern inline bool is_inherit_top_app(struct task_struct *p);
+
+#define INHERIT_DEPTH 2
+extern inline void set_inherit_top_app(struct task_struct *p,
+					struct task_struct *from);
+extern inline void restore_inherit_top_app(struct task_struct *p);
 #endif

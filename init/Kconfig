@@ -95,6 +95,8 @@ config LOCALVERSION
 	  object and source tree, in that order.  Your total string can
 	  be a maximum of 64 characters.
 
+
+
 config LOCALVERSION_AUTO
 	bool "Automatically append version information to the version string"
 	default y
@@ -1090,6 +1092,18 @@ config SCHED_CORE_CTL
 
 	  If unsure, say N here.
 
+config PERF_HUMANTASK
+       bool "enable feature humantask"
+       default n
+       help
+         support switch on/off of sched humantask.
+
+config PERF_CRITICAL_RT_TASK
+	bool "enable set rt binder thread" if EXPERT
+	default n
+	help
+	  speedui feature set BlastBufferQueue binder thread FIFO.
+
 menuconfig NAMESPACES
 	bool "Namespaces support" if EXPERT
 	depends on MULTIUSER
@@ -1482,6 +1496,12 @@ config ELF_CORE
 	help
 	  Enable support for generating core dumps. Disabling saves about 4k.
 
+config SF_BINDER
+	default n
+	bool "surfaceflinger binder thread" if EXPERT
+	help
+	  Xiaomi restore surfaceflinger binder prio FIFO
+
 
 config PCSPKR_PLATFORM
 	bool "Enable PC-Speaker support" if EXPERT
@@ -1648,14 +1668,30 @@ config KALLSYMS_BASE_RELATIVE
 # end of the "standard kernel features (expert users)" menu
 
 # syscall, maps, verifier
+
+config BPF_LSM
+	bool "LSM Instrumentation with BPF"
+	depends on BPF_SYSCALL
+	depends on SECURITY
+	depends on BPF_JIT
+	help
+	  Enables instrumentation of the security hooks with eBPF programs for
+	  implementing dynamic MAC and Audit Policies.
+
+	  If you are unsure how to answer this question, answer N.
+
 config BPF_SYSCALL
 	bool "Enable bpf() system call"
 	select BPF
 	select IRQ_WORK
+	select TASKS_TRACE_RCU
 	default n
 	help
 	  Enable the bpf() system call that allows to manipulate eBPF
 	  programs and maps via file descriptors.
+
+config ARCH_WANT_DEFAULT_BPF_JIT
+	bool
 
 config BPF_JIT_ALWAYS_ON
 	bool "Permanently enable BPF JIT and remove BPF interpreter"
@@ -1663,6 +1699,22 @@ config BPF_JIT_ALWAYS_ON
 	help
 	  Enables BPF JIT and removes BPF interpreter to avoid
 	  speculative execution of BPF instructions by the interpreter
+
+config BPF_UNPRIV_DEFAULT_OFF
+	bool "Disable unprivileged BPF by default"
+	depends on BPF_SYSCALL
+	help
+	  Disables unprivileged BPF by default by setting the corresponding
+	  /proc/sys/kernel/unprivileged_bpf_disabled knob to 2. An admin can
+	  still reenable it by setting it to 0 later on, or permanently
+	  disable it by setting it to 1 (from which no other transition to
+	  0 is possible anymore).
+
+config BPF_JIT_DEFAULT_ON
+	def_bool ARCH_WANT_DEFAULT_BPF_JIT || BPF_JIT_ALWAYS_ON
+	depends on HAVE_EBPF_JIT && BPF_JIT
+
+source "kernel/bpf/preload/Kconfig"
 
 config USERFAULTFD
 	bool "Enable userfaultfd() system call"
@@ -2221,6 +2273,9 @@ config ASN1
 	  functions to call on what tags.
 
 source "kernel/Kconfig.locks"
+
+config ARCH_HAS_NON_OVERLAPPING_ADDRESS_SPACE
+	bool
 
 config ARCH_HAS_SYNC_CORE_BEFORE_USERMODE
 	bool

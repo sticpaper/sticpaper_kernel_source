@@ -16,6 +16,9 @@
 #include <linux/ioprio.h>
 #include <linux/blktrace_api.h>
 #include <linux/blk-cgroup.h>
+
+
+
 #include "blk.h"
 #include "blk-wbt.h"
 
@@ -37,6 +40,11 @@ static u64 cfq_group_idle = NSEC_PER_SEC / 125;
 static const u64 cfq_target_latency = (u64)NSEC_PER_SEC * 3/10; /* 300 ms */
 static const int cfq_hist_divisor = 4;
 
+
+
+
+
+
 /*
  * offset from end of queue service tree for idle class
  */
@@ -45,6 +53,9 @@ static const int cfq_hist_divisor = 4;
 #define CFQ_SLICE_MODE_GROUP_DELAY (NSEC_PER_SEC / 5)
 /* offset from end of group service under IOPS mode */
 #define CFQ_IOPS_MODE_GROUP_DELAY (HZ / 5)
+
+
+
 
 /*
  * below this threshold, we consider thinktime immediate
@@ -72,6 +83,8 @@ static struct kmem_cache *cfq_pool;
 
 #define sample_valid(samples)	((samples) > 80)
 #define rb_entry_cfqg(node)	rb_entry((node), struct cfq_group, rb_node)
+
+
 
 /* blkio-related constants */
 #define CFQ_WEIGHT_LEGACY_MIN	10

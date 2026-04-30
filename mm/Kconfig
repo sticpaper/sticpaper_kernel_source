@@ -885,3 +885,11 @@ config FORCE_ALLOC_FROM_DMA_ZONE
 	  always using ZONE_DMA32 memory.
 
 	  If unsure, say "n".
+
+config MOON_MEMCG_RECLAIM
+	bool "moon-rom create memcg memory.moon_reclaim node"
+	depends on MEMCG && ZRAM
+	help
+	  Create a memory reclaim interface in each mem cgroup.
+	  which is used by Android process to reclaim the memory
+	  of the specified mem cgroup resources.

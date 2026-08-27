@@ -1,3 +1,1 @@
-. ${ROOT_DIR}/${KERNEL_DIR}/build.config.common
-. ${ROOT_DIR}/${KERNEL_DIR}/build.config.aarch64
-. ${ROOT_DIR}/${KERNEL_DIR}/build.config.gki_kasan
+/mnt/moon_storage/moon_source/moon_sm8250_kernel/build.config.gki_kasan.aarch64

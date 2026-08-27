@@ -1,11 +1,1 @@
-ARCH=arm
-
-CROSS_COMPILE=arm-linux-gnueabi-
-LINUX_GCC_CROSS_COMPILE_PREBUILTS_BIN=prebuilts/gas/linux-x86
-
-FILES="
-arch/arm/boot/Image.gz
-arch/arm/boot/Image
-vmlinux
-System.map
-"
+/mnt/moon_storage/moon_source/moon_sm8250_kernel/build.config.arm

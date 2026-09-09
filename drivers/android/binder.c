@@ -77,6 +77,11 @@
 #include "binder_trace.h"
 #include <trace/hooks/binder.h>
 
+#ifdef CONFIG_MOON_SCHED_ENGINE
+extern void set_moon_task_boost_for_launch(struct binder_transaction *t, struct task_struct *task);
+static bool moon_os4_rust_app_boost = false;
+#endif
+
 static HLIST_HEAD(binder_deferred_list);
 static DEFINE_MUTEX(binder_deferred_lock);
 

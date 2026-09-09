@@ -1685,6 +1685,14 @@ static inline struct timespec64 inode_set_ctime(struct inode *inode,
 	return inode_set_ctime_to_ts(inode, ts);
 }
 
+/**
+ * inode_get_mtime() for Launcher Boost
+ */
+static inline struct timespec64 inode_get_mtime(const struct inode *inode)
+{
+	return inode->i_mtime;
+}
+
 /*
  * Snapshotting support.
  */

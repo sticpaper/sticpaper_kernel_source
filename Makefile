@@ -964,7 +964,10 @@ CC_FLAGS_LTO	+= -fvisibility=default
 endif
 
 # Limit inlining across translation units to reduce binary size
-KBUILD_LDFLAGS += -mllvm -import-instr-limit=5
+# moon-kernel changes:
+# To improve overall kernel performance after LTO_CLANG,
+# the default LTO limit has been raised from 5 change 80.
+KBUILD_LDFLAGS += -mllvm -import-instr-limit=80
 endif
 
 ifdef CONFIG_LTO

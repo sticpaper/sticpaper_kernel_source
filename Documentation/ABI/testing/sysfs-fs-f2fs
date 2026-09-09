@@ -551,3 +551,82 @@ Description:	This is a read-only entry to show the value of sb.s_encoding_flags,
 		SB_ENC_STRICT_MODE_FL            0x00000001
 		SB_ENC_NO_COMPAT_FALLBACK_FL     0x00000002
 		============================     ==========
+
+What:		/sys/fs/f2fs/<disk>/atgc_enabled
+Date:		Feb 2024
+Contact:	"Jinbao Liu" <liujinbao1@xiaomi.com>
+Description:	It represents whether ATGC is on or off. The value is 1 which
+		indicates that ATGC is on, and 0 indicates that it is off.
+
+What:		/sys/fs/f2fs/<disk>/defrag_blocks
+Date:		February 2026
+Contact:	"Jinbao Liu" <liujinbao1@xiaomi.com>
+Description:	Number of blocks moved by defragment.
+		Available when CONFIG_F2FS_STAT_FS=y.
+
+What:		/sys/fs/f2fs/<disk>/discard_io_aware
+Date:		November 2023
+Contact:	"Chao Yu" <chao@kernel.org>
+Description:	It controls to enable/disable IO aware feature for background discard.
+		By default, the value is 1 which indicates IO aware is on.
+
+What:           /sys/fs/f2fs/<disk>/max_age_cache_page
+Date:           May 2026
+Contact:        "Yuenan Zhao" <amktiao030215@gmail.com>
+Description:    Used to control the maximum limit for age-based page cache.
+
+What:           /sys/fs/f2fs/<disk>/max_discard_boost
+Date:           May 2026
+Contact:        "Yuenan Zhao" <amktiao030215@gmail.com>
+Description:    Upper limit on discard requests during accelerated async fstrim.
+
+What:           /sys/fs/f2fs/<disk>/async_fstrim
+Date:           May 2026
+Contact:        "Yuenan Zhao" <amktiao030215@gmail.com>
+Description:	The f2fs_trim_fs toggle determines whether execution is sync or async.
+		sync execution: blocks during the trim process until all discard operations
+		are complete; async execution: submits candidates to be discard to a
+		pending list and runs the discard process during f2fs_idle_io periods.
+
+What:		/sys/fs/f2fs/<disk>/adjust_lock_priority
+Date:		January 2026
+Contact:	"Chao Yu" <chao@kernel.org>
+Description:	This sysfs entry can be used to enable/disable to adjust priority for task
+		which is in critical region covered by lock.
+		==========     ==================
+		Flag_Value     Flag_Description
+		==========     ==================
+		0x00000000     Disabled (default)
+		0x00000001     cp_rwsem
+		0x00000002     node_change
+		0x00000004     node_write
+		0x00000008     gc_lock
+		0x00000010     cp_global
+		0x00000020     io_rwsem
+		0x00000040     nat_tree_lock
+		==========     ==================
+
+What:		/sys/fs/f2fs/<disk>/lock_duration_priority
+Date:		January 2026
+Contact:	"Chao Yu" <chao@kernel.org>
+Description:	f2fs can tune priority of thread which has entered into critical region covered by
+		f2fs rwsemphore lock. This sysfs entry can be used to control priority value, the
+		range is [100,139], by default the value is 120.
+
+What:		/sys/fs/f2fs/<disk>/critical_task_priority
+Date:		February 2026
+Contact:	"Chao Yu" <chao@kernel.org>
+Description:	It can be used to tune priority of f2fs critical task, e.g. f2fs_ckpt, f2fs_gc
+		threads, limitation as below:
+		- it requires user has CAP_SYS_NICE capability.
+		- the range is [100, 139], by default the value is 120.
+
+What:		/sys/fs/f2fs/<disk>/max_atc_write_bio_size
+Date:		June 2026
+Contact:	Bart Van Assche <bvanassche@acm.org>
+Description:	Every time a write operation completes f2fs_write_end_io() is
+		called. This function may be called from an atomic context,
+		e.g. from inside an interrupt handler. This attribute controls
+		the maximum size of a write bio that is completed in atomic
+		(atc) context. The default value for this attribute is UINT_MAX
+		which means that this functionality is disabled by default.

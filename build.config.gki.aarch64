@@ -37,6 +37,7 @@ android/abi_gki_aarch64_zebra
 android/abi_gki_aarch64_asus
 android/abi_gki_aarch64_transsion
 android/abi_gki_aarch64_tuxera
+android/abi_gki_aarch64_moon
 "
 
 FILES="${FILES}
